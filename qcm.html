@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QCM – Architecture 1-tiers</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; }
+    h1 { margin-bottom: 6px; }
+    .muted { color: #555; margin-top: 0; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 14px; margin: 12px 0; }
+    .q-title { font-weight: 700; margin-bottom: 10px; }
+    label { display: block; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+    label:hover { background: #f6f6f6; }
+    .actions { display: flex; gap: 10px; margin: 18px 0; flex-wrap: wrap; }
+    button { padding: 10px 14px; border: 1px solid #333; border-radius: 10px; background: #fff; cursor: pointer; }
+    button:hover { background: #f2f2f2; }
+    .result { font-weight: 700; padding: 12px; border-radius: 10px; background: #f7f7f7; }
+    .ok { outline: 2px solid #2e7d32; background: #eaf6ec; }
+    .bad { outline: 2px solid #c62828; background: #fdecea; }
+    .hint { margin-top: 8px; color: #333; }
+  </style>
+</head>
+<body>
+  <h1>QCM – Architecture 1-tiers</h1>
+  <p class="muted">Choisis une réponse par question, puis clique sur “Corriger”.</p>
+
+  <div id="quiz"></div>
+
+  <div class="actions">
+    <button id="btn-grade">Corriger</button>
+    <button id="btn-reset">Réinitialiser</button>
+    <button id="btn-show-answers">Afficher les réponses</button>
+    <button id="btn-hide-answers">Masquer les réponses</button>
+  </div>
+
+  <div id="score" class="result" style="display:none;"></div>
+
+<script>
+  // Questions QCM (20)
+  const quizData = [
+    { q: "Qu’est-ce qui caractérise principalement une architecture 1-tiers ?",
+      options: { A:"Plusieurs serveurs", B:"Séparation stricte des couches", C:"Application en un seul bloc", D:"Base distante" },
+      answer: "C"
+    },
+    { q: "Dans une architecture 1-tiers, où se trouvent les données ?",
+      options: { A:"Sur un serveur distant", B:"Dans le cloud", C:"Dans la même application que l’interface", D:"Dans un microservice dédié" },
+      answer: "C"
+    },
+    { q: "Une application Access (tables + formulaires + VBA dans un seul fichier) est :",
+      options: { A:"3-tiers", B:"N-tiers", C:"1-tiers", D:"Microservices" },
+      answer: "C"
+    },
+    { q: "L’architecture 1-tiers est surtout adaptée :",
+      options: { A:"Systèmes distribués complexes", B:"Applications simples et locales", C:"Applications Web à grande échelle", D:"Systèmes critiques HA" },
+      answer: "B"
+    },
+    { q: "Quel est le principal avantage de l’architecture 1-tiers ?",
+      options: { A:"Haute scalabilité", B:"Sécurité maximale", C:"Simplicité de conception", D:"Tolérance aux pannes" },
+      answer: "C"
+    },
+    { q: "Dans une architecture 1-tiers, la logique métier est :",
+      options: { A:"Sur un serveur applicatif", B:"Dans une API REST", C:"Intégrée à l’application", D:"Externalisée" },
+      answer: "C"
+    },
+    { q: "Une application 1-tiers peut-elle être multi-utilisateurs ?",
+      options: { A:"Non, jamais", B:"Oui, dans certains contextes", C:"Uniquement via microservices", D:"Seulement via le cloud" },
+      answer: "B"
+    },
+    { q: "Quel élément n’est généralement PAS présent dans une architecture 1-tiers ?",
+      options: { A:"Interface utilisateur", B:"Logique métier", C:"Serveur d’API dédié", D:"Accès aux données" },
+      answer: "C"
+    },
+    { q: "Le principal inconvénient de l’architecture 1-tiers est :",
+      options: { A:"Son coût élevé", B:"Sa complexité", C:"Sa faible évolutivité", D:"Sa lenteur réseau" },
+      answer: "C"
+    },
+    { q: "Dans une architecture 1-tiers, la maintenance devient difficile lorsque :",
+      options: { A:"L’application est locale", B:"Le nombre d’utilisateurs augmente", C:"Il n’y a pas de base de données", D:"Le langage est simple" },
+      answer: "B"
+    },
+    { q: "Une architecture 1-tiers est dite « monolithique » car :",
+      options: { A:"Elle utilise un seul langage", B:"Elle est installée sur un serveur", C:"Elle forme un bloc unique", D:"Elle utilise un seul utilisateur" },
+      answer: "C"
+    },
+    { q: "L’accès aux fichiers dans une application 1-tiers se fait généralement :",
+      options: { A:"Via une API distante", B:"Via des appels directs au système", C:"Via un message broker", D:"Via un load balancer" },
+      answer: "B"
+    },
+    { q: "Quelle affirmation est correcte ?",
+      options: { A:"1-tiers = 1 utilisateur", B:"1-tiers = 1 couche logique", C:"1-tiers = 1 base cloud", D:"1-tiers = 1 microservice" },
+      answer: "B"
+    },
+    { q: "Quelle technologie correspond le mieux à une architecture 1-tiers ?",
+      options: { A:"Application distribuée", B:"Application Access locale", C:"Microservices Docker", D:"Web + API Gateway" },
+      answer: "B"
+    },
+    { q: "Dans une architecture 1-tiers, la sécurité dépend surtout :",
+      options: { A:"Du firewall réseau", B:"Du serveur central", C:"Du poste utilisateur", D:"Du cloud provider" },
+      answer: "C"
+    },
+    { q: "Quelle évolution logique suit souvent l’architecture 1-tiers ?",
+      options: { A:"Vers le peer-to-peer", B:"Vers le 2-tiers ou 3-tiers", C:"Vers le mainframe", D:"Vers l’abandon" },
+      answer: "B"
+    },
+    { q: "L’architecture 1-tiers est recommandée pour :",
+      options: { A:"Systèmes bancaires nationaux", B:"Applications pédagogiques", C:"Plateformes e-commerce massives", D:"Systèmes distribués critiques" },
+      answer: "B"
+    },
+    { q: "Quel problème apparaît souvent en multi-postes avec du 1-tiers ?",
+      options: { A:"Latence réseau élevée", B:"Conflits d’accès aux données", C:"Surconsommation CPU serveur", D:"Complexité du load balancing" },
+      answer: "B"
+    },
+    { q: "Une application Access « split » (front/back) est :",
+      options: { A:"Toujours 1-tiers", B:"Toujours N-tiers", C:"Plus strictement 1-tiers", D:"Cloud native" },
+      answer: "C"
+    },
+    { q: "Quelle phrase décrit le mieux l’architecture 1-tiers ?",
+      options: { A:"Application distribuée par services", B:"Application découpée en couches indépendantes", C:"Application autonome regroupant tous ses composants", D:"Application reposant sur un serveur applicatif" },
+      answer: "C"
+    }
+  ];
+
+  const quizEl = document.getElementById("quiz");
+
+  function renderQuiz() {
+    quizEl.innerHTML = "";
+    quizData.forEach((item, idx) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.id = `q${idx}`;
+
+      const title = document.createElement("div");
+      title.className = "q-title";
+      title.textContent = `Q${idx+1}. ${item.q}`;
+      card.appendChild(title);
+
+      Object.entries(item.options).forEach(([key, labelText]) => {
+        const label = document.createElement("label");
+        label.innerHTML = `
+          <input type="radio" name="q_${idx}" value="${key}">
+          <strong>${key}.</strong> ${labelText}
+        `;
+        card.appendChild(label);
+      });
+
+      const hint = document.createElement("div");
+      hint.className = "hint";
+      hint.style.display = "none";
+      hint.id = `hint${idx}`;
+      card.appendChild(hint);
+
+      quizEl.appendChild(card);
+    });
+  }
+
+  function gradeQuiz(showAnswers=false) {
+    let score = 0;
+    quizData.forEach((item, idx) => {
+      const card = document.getElementById(`q${idx}`);
+      card.classList.remove("ok", "bad");
+
+      const selected = document.querySelector(`input[name="q_${idx}"]:checked`);
+      const hint = document.getElementById(`hint${idx}`);
+
+      if (!selected) {
+        hint.style.display = showAnswers ? "block" : "none";
+        hint.textContent = showAnswers ? `Réponse : ${item.answer}` : "";
+        card.classList.add("bad");
+        return;
+      }
+
+      const isCorrect = selected.value === item.answer;
+      if (isCorrect) score++;
+      card.classList.add(isCorrect ? "ok" : "bad");
+
+      if (showAnswers) {
+        hint.style.display = "block";
+        hint.textContent = `Réponse : ${item.answer}`;
+      } else {
+        hint.style.display = "none";
+        hint.textContent = "";
+      }
+    });
+
+    const scoreEl = document.getElementById("score");
+    scoreEl.style.display = "block";
+    scoreEl.textContent = `Score : ${score} / ${quizData.length}`;
+  }
+
+  function resetQuiz() {
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    quizData.forEach((_, idx) => {
+      const card = document.getElementById(`q${idx}`);
+      card.classList.remove("ok", "bad");
+      const hint = document.getElementById(`hint${idx}`);
+      hint.style.display = "none";
+      hint.textContent = "";
+    });
+    const scoreEl = document.getElementById("score");
+    scoreEl.style.display = "none";
+    scoreEl.textContent = "";
+  }
+
+  function hideAnswers() {
+    quizData.forEach((_, idx) => {
+      const hint = document.getElementById(`hint${idx}`);
+      hint.style.display = "none";
+      hint.textContent = "";
+    });
+  }
+
+  renderQuiz();
+
+  document.getElementById("btn-grade").addEventListener("click", () => gradeQuiz(false));
+  document.getElementById("btn-reset").addEventListener("click", resetQuiz);
+  document.getElementById("btn-show-answers").addEventListener("click", () => gradeQuiz(true));
+  document.getElementById("btn-hide-answers").addEventListener("click", hideAnswers);
+</script>
+</body>
+</html>
