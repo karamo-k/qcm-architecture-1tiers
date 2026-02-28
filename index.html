@@ -3,596 +3,495 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>QCM — Réseaux & TCP/IP</title>
+<title>QCM — Réseaux & TCP/IP | L2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#09090f;--surface:#13131f;--surface2:#1c1c2e;--border:#2a2a40;
-  --accent:#6c63ff;--accent2:#ff6584;--gold:#ffd700;
-  --text:#e8e8f0;--muted:#8888aa;--radius:16px;
-  --font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;
-}
+:root{--bg:#09090f;--surface:#13131f;--surface2:#1c1c2e;--border:#2a2a40;--accent:#6c63ff;--text:#e8e8f0;--muted:#8888aa;--radius:16px;--font:'Space Grotesk',sans-serif;--mono:'JetBrains Mono',monospace;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
 .app{max-width:430px;margin:0 auto;min-height:100vh;position:relative;overflow-x:hidden;}
 .glow{position:fixed;border-radius:50%;filter:blur(80px);opacity:.13;pointer-events:none;z-index:0;}
 .g1{width:300px;height:300px;background:#6c63ff;top:-100px;right:-80px;}
 .g2{width:250px;height:250px;background:#ff6584;bottom:60px;left:-100px;}
-
-/* ── SCREENS ── */
 .screen{position:relative;z-index:1;display:none;}
 .screen.active{display:block;}
 
+/* ── SETUP (teacher config) ── */
+#setupScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:22px;}
+#setupScreen.active{display:flex;}
+.setup-icon{width:70px;height:70px;background:linear-gradient(135deg,#f6ad55,#ed8936);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto;box-shadow:0 0 30px rgba(237,137,54,.4);}
+.setup-title{font-size:20px;font-weight:800;text-align:center;color:#f6ad55;}
+.setup-sub{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;}
+.setup-card{background:var(--surface);border:1.5px solid rgba(237,137,54,.3);border-radius:var(--radius);padding:24px 20px;width:100%;display:flex;flex-direction:column;gap:16px;}
+.fl{display:flex;flex-direction:column;gap:6px;}
+.fl label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.fi{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;width:100%;}
+.fi:focus{border-color:var(--accent);}
+.fi::placeholder{color:#44445a;}
+.fi-normal{font-family:var(--font);font-size:15px;}
+.btn-setup{width:100%;padding:14px;background:linear-gradient(135deg,#f6ad55,#ed8936);border:none;border-radius:11px;color:#1a0f00;font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s;}
+.btn-setup:hover{opacity:.9;}
+.em{color:#fc8181;font-size:13px;background:rgba(252,129,129,.1);border-radius:8px;padding:10px;display:none;text-align:center;}
+.setup-info{background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--muted);line-height:1.8;width:100%;}
+.setup-info strong{color:#a78bfa;}
+.setup-info code{background:rgba(108,99,255,.15);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#c4b5fd;}
+.setup-steps{display:flex;flex-direction:column;gap:8px;width:100%;}
+.step{display:flex;gap:10px;align-items:flex-start;}
+.step-num{min-width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.step-txt{font-size:13px;color:var(--muted);line-height:1.5;}
+.step-txt strong{color:var(--text);}
+.btn-already{width:100%;padding:12px;background:transparent;border:1.5px solid var(--border);border-radius:10px;color:var(--muted);font-family:var(--font);font-size:13px;cursor:pointer;transition:all .2s;}
+.btn-already:hover{border-color:var(--accent);color:var(--text);}
+.token-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:12px;}
+.ts-ok{background:rgba(72,187,120,.1);border:1px solid rgba(72,187,120,.2);color:#68d391;}
+.ts-no{background:rgba(252,129,129,.1);border:1px solid rgba(252,129,129,.2);color:#fc8181;}
+
 /* ── LOGIN ── */
-#loginScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:28px;}
+#loginScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:24px;}
 #loginScreen.active{display:flex;}
 .logo-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;}
 .logo-icon{width:82px;height:82px;background:linear-gradient(135deg,#6c63ff,#ff6584);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 0 40px rgba(108,99,255,.45);}
 .logo-title{font-size:22px;font-weight:800;background:linear-gradient(135deg,#6c63ff,#ff6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .logo-sub{color:var(--muted);font-size:13px;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 22px;width:100%;display:flex;flex-direction:column;gap:18px;}
-.field-group{display:flex;flex-direction:column;gap:6px;}
-.field-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.field-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;color:var(--text);font-family:var(--font);font-size:15px;outline:none;transition:border-color .2s;width:100%;}
-.field-input:focus{border-color:var(--accent);}
-.field-input::placeholder{color:#44445a;}
-.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,#6c63ff,#9f7aea);border:none;border-radius:12px;color:#fff;font-family:var(--font);font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,.4);transition:opacity .2s,transform .1s;}
-.btn-primary:hover{opacity:.9;}
-.btn-primary:active{transform:scale(.98);}
-.error-msg{color:#fc8181;font-size:13px;text-align:center;background:rgba(252,129,129,.1);border-radius:8px;padding:10px;display:none;}
-.info-box{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.7;width:100%;}
-.info-box strong{color:var(--accent);}
+.bp{width:100%;padding:15px;background:linear-gradient(135deg,#6c63ff,#9f7aea);border:none;border-radius:12px;color:#fff;font-family:var(--font);font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,.4);transition:opacity .2s,transform .1s;}
+.bp:hover{opacity:.9;}.bp:active{transform:scale(.98);}
+.ib{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.7;width:100%;}
+.ib strong{color:var(--accent);}
+.cfg-link{font-size:12px;color:#f6ad55;text-align:center;cursor:pointer;text-decoration:underline;}
+.cfg-link:hover{color:#fbd38d;}
 
 /* ── HEADER ── */
-.qcm-header{position:sticky;top:0;z-index:10;background:rgba(9,9,15,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 18px 12px;}
-.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.user-badge{display:flex;align-items:center;gap:9px;}
-.avatar{width:33px;height:33px;background:linear-gradient(135deg,#6c63ff,#ff6584);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
-.u-name{font-size:13px;font-weight:600;}
-.u-spec{font-size:11px;color:var(--muted);}
-.timer{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--mono);font-size:16px;font-weight:700;}
-.timer.urgent{color:#fc8181;border-color:rgba(252,129,129,.4);animation:pulse 1s infinite;}
-.tdot{width:6px;height:6px;border-radius:50%;background:#68d391;}
-.tdot.urgent{background:#fc8181;}
+.qh{position:sticky;top:0;z-index:10;background:rgba(9,9,15,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 18px 12px;}
+.ht{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ub{display:flex;align-items:center;gap:9px;}
+.av{width:33px;height:33px;background:linear-gradient(135deg,#6c63ff,#ff6584);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+.un{font-size:13px;font-weight:600;}.us{font-size:11px;color:var(--muted);}
+.tm{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--mono);font-size:16px;font-weight:700;}
+.tm.urgent{color:#fc8181;border-color:rgba(252,129,129,.4);animation:pulse 1s infinite;}
+.td{width:6px;height:6px;border-radius:50%;background:#68d391;}
+.td.urgent{background:#fc8181;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-.prog-wrap{background:var(--border);border-radius:99px;height:4px;}
-.prog-fill{height:4px;border-radius:99px;background:linear-gradient(90deg,#6c63ff,#ff6584);transition:width .35s;}
-.prog-text{font-size:11px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;}
-
-/* ── QUESTION ── */
-.qcm-body{padding:20px 16px 105px;}
-.sec-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;}
-.q-num{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:8px;}
-.q-text{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:22px;}
-.options{display:flex;flex-direction:column;gap:10px;}
+.pw{background:var(--border);border-radius:99px;height:4px;}
+.pf{height:4px;border-radius:99px;background:linear-gradient(90deg,#6c63ff,#ff6584);transition:width .35s;}
+.pt{font-size:11px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;}
+/* QUESTION */
+.qb{padding:20px 16px 105px;}
+.sp{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:14px;}
+.qn{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:8px;}
+.qt{font-size:17px;font-weight:700;line-height:1.5;margin-bottom:22px;}
+.opts{display:flex;flex-direction:column;gap:10px;}
 .opt{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .17s;text-align:left;width:100%;}
 .opt:hover{border-color:#44446a;}
-.opt.selected{border-color:var(--accent);background:rgba(108,99,255,.12);}
-.opt.correct{border-color:#68d391;background:rgba(104,211,145,.12);}
-.opt.wrong{border-color:#fc8181;background:rgba(252,129,129,.12);}
-.opt-label{min-width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:var(--surface2);color:var(--muted);flex-shrink:0;transition:all .17s;}
-.opt.selected .opt-label{background:var(--accent);color:#fff;}
-.opt.correct .opt-label{background:#68d391;color:#1a3a2a;}
-.opt.wrong .opt-label{background:#fc8181;color:#3a1a1a;}
-.opt-text{font-size:14px;line-height:1.45;color:var(--text);padding-top:4px;}
-
-/* ── NAV BAR ── */
-.nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(19,19,31,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:12px 16px 22px;display:flex;gap:10px;align-items:center;z-index:20;}
-.btn-nav{flex:1;padding:13px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
-.btn-prev{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.btn-prev:hover{background:var(--border);}
-.btn-prev:disabled{opacity:.3;cursor:not-allowed;}
-.btn-next{background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;}
-.btn-next:disabled{opacity:.3;cursor:not-allowed;}
-.btn-submit{background:linear-gradient(135deg,#48bb78,#38a169);color:#fff;font-size:13px;}
-.btn-map{width:40px;height:40px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:18px;flex-shrink:0;}
-.btn-map:hover{border-color:var(--accent);color:var(--text);}
-
-/* ── MAP MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:50;align-items:flex-end;}
-.modal-bg.open{display:flex;}
-.map-sheet{background:var(--surface);border-radius:20px 20px 0 0;border-top:1px solid var(--border);padding:18px 18px 32px;width:100%;max-height:65vh;overflow-y:auto;}
-.map-handle{width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px;}
-.map-title{font-size:15px;font-weight:700;margin-bottom:14px;}
-.map-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
-.map-cell{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .15s;}
-.map-cell.answered{background:rgba(108,99,255,.3);border-color:var(--accent);color:var(--accent);}
-.map-cell.current{background:var(--accent);color:#fff;border-color:var(--accent);}
-
-/* ── CONFIRM MODAL ── */
-.confirm-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:24px;}
-.confirm-bg.open{display:flex;}
-.confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;}
-.confirm-icon{font-size:40px;text-align:center;margin-bottom:14px;}
-.confirm-title{font-size:20px;font-weight:800;text-align:center;margin-bottom:8px;}
-.confirm-sub{font-size:14px;color:var(--muted);text-align:center;margin-bottom:22px;line-height:1.6;}
-.confirm-sub strong{color:var(--text);}
-.confirm-btns{display:flex;gap:10px;}
-.btn-cancel{flex:1;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;cursor:pointer;}
-.btn-confirm{flex:1;padding:13px;background:linear-gradient(135deg,#48bb78,#38a169);border:none;border-radius:10px;color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
-
-/* ── RESULTS ── */
-#resultsScreen{padding:20px 16px 40px;}
-.timeout-badge{background:rgba(252,129,129,.12);border:1px solid rgba(252,129,129,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#fc8181;text-align:center;margin-bottom:16px;display:none;}
-.results-hero{text-align:center;padding:24px 0 20px;margin-bottom:20px;}
-.score-ring{width:140px;height:140px;margin:0 auto 16px;position:relative;}
-.score-svg{transform:rotate(-90deg);}
-.ring-bg{fill:none;stroke:var(--border);stroke-width:10;}
-.ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s ease;}
-.score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.score-num{font-size:34px;font-weight:800;}
-.score-den{font-size:14px;color:var(--muted);}
-.score-grade{font-size:26px;font-weight:800;margin-bottom:5px;}
-.score-user{font-size:13px;color:var(--muted);}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;}
-.stat-val{font-size:22px;font-weight:800;}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
-.sec-results{margin-bottom:18px;}
-.sec-results h3{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-left:2px;}
-.result-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
-.r-icon{font-size:16px;flex-shrink:0;margin-top:2px;}
-.r-q{font-size:13px;line-height:1.4;margin-bottom:4px;font-weight:600;}
-.r-a{font-size:12px;margin-bottom:2px;}
-.r-a.ok{color:#68d391;}
-.r-a.ko{color:#fc8181;}
-.r-correct{font-size:12px;color:#68d391;}
-.sync-btn{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#6c63ff,#9f7aea);border:none;color:#fff;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;box-shadow:0 4px 20px rgba(108,99,255,.35);transition:opacity .2s;}
-.sync-btn:hover{opacity:.9;}
-.sync-btn.synced{background:linear-gradient(135deg,#48bb78,#38a169);box-shadow:0 4px 20px rgba(72,187,120,.3);}
-.reset-btn{width:100%;padding:13px;border-radius:12px;background:transparent;border:1.5px solid var(--border);color:var(--muted);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .2s;}
-.reset-btn:hover{border-color:var(--accent);color:var(--text);}
-
+.opt.sel{border-color:var(--accent);background:rgba(108,99,255,.12);}
+.ol{min-width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:var(--surface2);color:var(--muted);flex-shrink:0;transition:all .17s;}
+.opt.sel .ol{background:var(--accent);color:#fff;}
+.ot{font-size:14px;line-height:1.45;color:var(--text);padding-top:4px;}
+/* NAV */
+.nb{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(19,19,31,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:12px 16px 22px;display:flex;gap:10px;align-items:center;z-index:20;}
+.bn{flex:1;padding:13px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.bpv{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.bpv:disabled{opacity:.3;cursor:not-allowed;}
+.bnx{background:linear-gradient(135deg,#6c63ff,#9f7aea);color:#fff;}
+.bsb{background:linear-gradient(135deg,#48bb78,#38a169);color:#fff;font-size:13px;}
+.bm{width:40px;height:40px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:18px;flex-shrink:0;}
+/* MAP */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);z-index:50;align-items:flex-end;}
+.mo.open{display:flex;}
+.ms{background:var(--surface);border-radius:20px 20px 0 0;border-top:1px solid var(--border);padding:18px 18px 32px;width:100%;max-height:65vh;overflow-y:auto;}
+.mh{width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px;}
+.mt2{font-size:15px;font-weight:700;margin-bottom:14px;}
+.mg{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.mc{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);}
+.mc.ans{background:rgba(108,99,255,.3);border-color:var(--accent);color:var(--accent);}
+.mc.cur{background:var(--accent);color:#fff;border-color:var(--accent);}
+/* CONFIRM */
+.cb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:24px;}
+.cb.open{display:flex;}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;}
+.ci{font-size:40px;text-align:center;margin-bottom:14px;}
+.ct{font-size:20px;font-weight:800;text-align:center;margin-bottom:8px;}
+.cs{font-size:14px;color:var(--muted);text-align:center;margin-bottom:22px;line-height:1.6;}
+.cs strong{color:var(--text);}
+.cbb{display:flex;gap:10px;}
+.bcl{flex:1;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;cursor:pointer;}
+.bcf{flex:1;padding:13px;background:linear-gradient(135deg,#48bb78,#38a169);border:none;border-radius:10px;color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
+/* RESULTS */
+#resultsScreen{padding:20px 16px 50px;}
+.tb{background:rgba(252,129,129,.12);border:1px solid rgba(252,129,129,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#fc8181;text-align:center;margin-bottom:16px;display:none;}
+.rh{text-align:center;padding:24px 0 20px;margin-bottom:20px;}
+.sr{width:140px;height:140px;margin:0 auto 16px;position:relative;}
+.sv{transform:rotate(-90deg);}
+.rb{fill:none;stroke:var(--border);stroke-width:10;}
+.rf{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s ease;}
+.si{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.sn{font-size:34px;font-weight:800;}.sd{font-size:14px;color:var(--muted);}
+.sg{font-size:26px;font-weight:800;margin-bottom:5px;}.su{font-size:13px;color:var(--muted);}
+.str{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.sc2{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;}
+.sv2{font-size:22px;font-weight:800;}.sl{font-size:11px;color:var(--muted);margin-top:2px;}
+.sz{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.szt{font-size:14px;font-weight:700;margin-bottom:14px;}
+.sbg{width:100%;padding:14px;border-radius:10px;border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#1a1a2e,#2d2d5e);border:1.5px solid #6c63ff;box-shadow:0 4px 16px rgba(108,99,255,.3);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;}
+.sbg:hover{background:linear-gradient(135deg,#6c63ff,#9f7aea);}
+.sbg:disabled{opacity:.4;cursor:not-allowed;}
+.sdl{width:100%;padding:14px;border-radius:10px;border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#48bb78,#38a169);transition:opacity .2s;}
+.sdl:hover{opacity:.9;}
+.ss{font-size:12px;padding:10px 12px;border-radius:8px;text-align:center;margin-top:10px;display:none;line-height:1.5;}
+.ss.ld{display:block;background:rgba(108,99,255,.1);color:#a78bfa;}
+.ss.ok{display:block;background:rgba(72,187,120,.1);color:#68d391;}
+.ss.er{display:block;background:rgba(252,129,129,.1);color:#fc8181;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.srs{margin-bottom:18px;}
+.srs h3{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;padding-left:2px;}
+.ri{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
+.ric{font-size:16px;flex-shrink:0;margin-top:2px;}
+.rq{font-size:13px;line-height:1.4;margin-bottom:4px;font-weight:600;}
+.ra{font-size:12px;margin-bottom:2px;}
+.ra.ok{color:#68d391;}.ra.ko{color:#fc8181;}
+.rc{font-size:12px;color:#68d391;}
+.rb2{width:100%;padding:13px;border-radius:12px;background:transparent;border:1.5px solid var(--border);color:var(--muted);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:all .2s;}
+.rb2:hover{border-color:var(--accent);color:var(--text);}
 @keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
 .slide-up{animation:slideUp .35s ease;}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="glow g1"></div>
-  <div class="glow g2"></div>
+<div class="glow g1"></div><div class="glow g2"></div>
 
-  <!-- ══ LOGIN ══ -->
-  <div id="loginScreen" class="screen active slide-up">
-    <div class="logo-wrap">
-      <div class="logo-icon">🌐</div>
-      <div class="logo-title">QCM — Réseaux & TCP/IP</div>
-      <div class="logo-sub">40 questions · 1h30 · L2_Miage_Info_RM6</div>
-    </div>
-    <div class="card">
-      <div class="field-group">
-        <div class="field-label">Nom</div>
-        <input class="field-input" id="inputNom" placeholder="Votre nom de famille" type="text"/>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Prénom</div>
-        <input class="field-input" id="inputPrenom" placeholder="Votre prénom" type="text"/>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Spécialité (mot de passe)</div>
-        <input class="field-input" id="inputSpec" placeholder="ex: miage, info, reseaux…" type="password"/>
-      </div>
-      <div class="error-msg" id="loginError">⚠️ Veuillez remplir tous les champs.</div>
-      <button class="btn-primary" onclick="startExam()">Commencer l'examen →</button>
-    </div>
-    <div class="info-box">
-      🕐 Durée : <strong>1h 30 min</strong><br/>
-      📋 <strong>40 questions</strong> à choix unique<br/>
-      ⚡ Soumission automatique à la fin du temps<br/>
-      📡 Synchronisation des résultats disponible après correction
-    </div>
+<!-- ===== SETUP (enseignant) ===== -->
+<div id="setupScreen" class="screen">
+  <div class="setup-icon">&#9881;&#65039;</div>
+  <div class="setup-title">Configuration Enseignant</div>
+  <div class="setup-sub">Entrez votre token GitHub ici.<br/>Il sera sauvegarde dans votre navigateur uniquement,<br/><strong style="color:#f6ad55">jamais dans le code source.</strong></div>
+
+  <div class="setup-steps">
+    <div class="step"><div class="step-num">1</div><div class="step-txt">Allez sur <strong>github.com</strong> → votre photo → <strong>Settings</strong></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>Developer settings</strong> → <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-txt">Cliquez <strong>Generate new token</strong>, cochez <strong>repo</strong>, generez et copiez le token</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-txt">Collez-le ci-dessous. Il commence par <strong>ghp_...</strong></div></div>
   </div>
 
-  <!-- ══ QCM ══ -->
-  <div id="qcmScreen" class="screen">
-    <div class="qcm-header">
-      <div class="header-top">
-        <div class="user-badge">
-          <div class="avatar" id="avatarEl"></div>
-          <div>
-            <div class="u-name" id="uName"></div>
-            <div class="u-spec" id="uSpec"></div>
-          </div>
-        </div>
-        <div class="timer" id="timerEl">
-          <div class="tdot" id="tdot"></div>
-          <span id="timerText">01:30:00</span>
-        </div>
-      </div>
-      <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-      <div class="prog-text">
-        <span id="progText">0/40 répondues</span>
-        <span id="qPosText">Q1 sur 40</span>
-      </div>
-    </div>
-
-    <div class="qcm-body" id="qcmBody"></div>
-
-    <div class="nav-bar">
-      <button class="btn-map" id="btnMap" title="Carte des questions">⊞</button>
-      <button class="btn-nav btn-prev" id="btnPrev" onclick="navigate(-1)">← Préc.</button>
-      <button class="btn-nav btn-next" id="btnNext" onclick="navigate(1)">Suiv. →</button>
-      <button class="btn-nav btn-submit" id="btnSubmit" onclick="openConfirm()" style="display:none">✅ Terminer</button>
-    </div>
+  <div class="setup-card">
+    <div class="fl"><label>Votre Personal Access Token GitHub</label><input class="fi" id="cfgToken" placeholder="votre-token-ici..." type="password"/></div>
+    <div class="fl"><label>Branche</label><input class="fi fi-normal" id="cfgBranch" placeholder="main" value="main"/></div>
+    <div class="em" id="cfgErr"></div>
+    <button class="btn-setup" onclick="saveConfig()">&#128274; Sauvegarder la configuration</button>
+    <button class="btn-already" onclick="skipSetup()">Continuer sans synchronisation</button>
   </div>
 
-  <!-- ══ RESULTS ══ -->
-  <div id="resultsScreen" class="screen">
-    <div class="timeout-badge" id="timeoutBadge">⏰ Temps écoulé — examen soumis automatiquement</div>
-    <div class="results-hero">
-      <div class="score-ring">
-        <svg class="score-svg" width="140" height="140" viewBox="0 0 140 140">
-          <circle class="ring-bg" cx="70" cy="70" r="54"/>
-          <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="54"
-            stroke="#6c63ff" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
-        </svg>
-        <div class="score-inner">
-          <div class="score-num" id="scoreNum">0</div>
-          <div class="score-den">/ 40</div>
-        </div>
-      </div>
-      <div class="score-grade" id="scoreGrade"></div>
-      <div class="score-user" id="scoreUser"></div>
-    </div>
-    <div class="stats-row" id="statsRow"></div>
-    <div id="sectionResults"></div>
-    <button class="sync-btn" id="syncBtn" onclick="syncResults()">📡 Synchroniser mes résultats</button>
-    <button class="reset-btn" onclick="resetApp()">🔄 Nouvelle session</button>
+  <div class="setup-info">
+    &#128275; <strong>Securite :</strong> Le token est stocke dans <code>localStorage</code> de votre navigateur.<br/>
+    Il n'apparait <strong>jamais</strong> dans le code HTML ou sur GitHub.<br/>
+    Vous pouvez le supprimer a tout moment via "Reinitialiser la configuration".
   </div>
 </div>
 
-<!-- MAP MODAL -->
-<div class="modal-bg" id="mapModal" onclick="closeMap(event)">
-  <div class="map-sheet">
-    <div class="map-handle"></div>
-    <div class="map-title" id="mapTitle">📋 Navigation</div>
-    <div class="map-grid" id="mapGrid"></div>
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen" class="screen">
+  <div class="logo-wrap">
+    <div class="logo-icon">&#127760;</div>
+    <div class="logo-title">QCM &mdash; Reseaux &amp; TCP/IP</div>
+    <div class="logo-sub">Licence 2 &middot; 40 questions &middot; 1h30 &middot; K. CAMARA</div>
+  </div>
+  <div class="card">
+    <div class="fl"><label>Nom</label><input class="fi fi-normal" id="iNom" placeholder="Votre nom de famille" type="text"/></div>
+    <div class="fl"><label>Prenom</label><input class="fi fi-normal" id="iPrenom" placeholder="Votre prenom" type="text"/></div>
+    <div class="fl"><label>Specialite (mot de passe)</label><input class="fi fi-normal" id="iSpec" placeholder="ex: miage, info, reseaux..." type="password"/></div>
+    <div class="em" id="loginErr"></div>
+    <button class="bp" onclick="startExam()">Commencer l'examen &rarr;</button>
+  </div>
+  <div class="ib" id="tokenStatusBox">&#128336; Duree : <strong>1h 30 min</strong> &bull; 40 questions &bull; Soumission automatique</div>
+  <div class="cfg-link" onclick="showScr('setupScreen')">&#9881;&#65039; Configurer la synchronisation GitHub</div>
+</div>
+
+<!-- ===== QCM ===== -->
+<div id="qcmScreen" class="screen">
+  <div class="qh">
+    <div class="ht">
+      <div class="ub"><div class="av" id="avt"></div><div><div class="un" id="uName"></div><div class="us" id="uSpec"></div></div></div>
+      <div class="tm" id="timerEl"><div class="td" id="tdot"></div><span id="timerTxt">01:30:00</span></div>
+    </div>
+    <div class="pw"><div class="pf" id="progFill" style="width:0%"></div></div>
+    <div class="pt"><span id="progTxt">0/40 repondues</span><span id="qPosTxt">Q1 sur 40</span></div>
+  </div>
+  <div class="qb" id="qcmBody"></div>
+  <div class="nb">
+    <button class="bm" id="btnMap">&#8862;</button>
+    <button class="bn bpv" id="btnPrev" onclick="nav(-1)">&larr; Prec.</button>
+    <button class="bn bnx" id="btnNext" onclick="nav(1)">Suiv. &rarr;</button>
+    <button class="bn bsb" id="btnSub" onclick="openConfirm()" style="display:none">&#10003; Terminer</button>
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div class="confirm-bg" id="confirmModal">
-  <div class="confirm-card">
-    <div class="confirm-icon">📤</div>
-    <div class="confirm-title">Soumettre l'examen ?</div>
-    <div class="confirm-sub" id="confirmSub"></div>
-    <div class="confirm-btns">
-      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
-      <button class="btn-confirm" onclick="submitExam(false)">Confirmer</button>
+<!-- ===== RESULTS ===== -->
+<div id="resultsScreen" class="screen">
+  <div class="tb" id="toBadge">&#9200; Temps ecoule &mdash; soumission automatique</div>
+  <div class="rh">
+    <div class="sr">
+      <svg class="sv" width="140" height="140" viewBox="0 0 140 140">
+        <circle class="rb" cx="70" cy="70" r="54"/>
+        <circle class="rf" id="ringFill" cx="70" cy="70" r="54" stroke="#6c63ff" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+      </svg>
+      <div class="si"><div class="sn" id="sNum">0</div><div class="sd">/ 40</div></div>
+    </div>
+    <div class="sg" id="sGrade"></div>
+    <div class="su" id="sUser"></div>
+  </div>
+  <div class="str" id="statsRow"></div>
+  <div class="sz">
+    <div class="szt">&#128225; Synchronisation des resultats</div>
+    <button class="sbg" id="syncBtn" onclick="syncGitHub()">
+      <svg width="17" height="17" fill="white" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+      Enregistrer dans note_L2.csv (GitHub)
+    </button>
+    <button class="sdl" onclick="dlCSV()">&#11015;&#65039; Telecharger ma fiche (.csv)</button>
+    <div class="ss" id="syncSt"></div>
+  </div>
+  <div id="secResults"></div>
+  <button class="rb2" onclick="resetApp()">&#128260; Nouvelle session</button>
+</div>
+</div>
+
+<!-- MAP -->
+<div class="mo" id="mapModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="ms"><div class="mh"></div><div class="mt2" id="mapTitle">Navigation</div><div class="mg" id="mapGrid"></div></div>
+</div>
+<!-- CONFIRM -->
+<div class="cb" id="confModal">
+  <div class="cc">
+    <div class="ci">&#128228;</div><div class="ct">Soumettre l'examen ?</div>
+    <div class="cs" id="confSub"></div>
+    <div class="cbb">
+      <button class="bcl" onclick="document.getElementById('confModal').classList.remove('open')">Annuler</button>
+      <button class="bcf" onclick="submitExam(false)">Confirmer</button>
     </div>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-//  DATA
-// ══════════════════════════════════════════════
-const QUESTIONS = [
-  {num:1,section:"Réseaux & Topologies",q:"Qu'est-ce qu'un réseau informatique ?",opts:["Un ensemble de logiciels installés sur un seul ordinateur","Un ensemble d'ordinateurs, périphériques et équipements interconnectés pour échanger des données","Un système de stockage de fichiers locaux","Un protocole de communication entre deux machines"],ans:1},
-  {num:2,section:"Réseaux & Topologies",q:"Parmi les propositions suivantes, laquelle n'est PAS un objectif d'un réseau informatique ?",opts:["Partage de ressources (imprimantes, fichiers)","Communication entre utilisateurs","Augmentation de la vitesse du processeur","Accès à Internet"],ans:2},
-  {num:3,section:"Réseaux & Topologies",q:"Quel équipement est le nœud central dans une topologie en étoile ?",opts:["Routeur","Modem","Hub ou Switch","Répéteur"],ans:2},
-  {num:4,section:"Réseaux & Topologies",q:"Dans une topologie en bus, quel composant est placé aux extrémités du câble pour éviter les rebonds de signal ?",opts:["Un répéteur","Un bouchon de terminaison","Un concentrateur","Un connecteur RJ45"],ans:1},
-  {num:5,section:"Réseaux & Topologies",q:"Quelle topologie utilise un câble coaxial avec des connecteurs en T ?",opts:["Topologie en étoile","Topologie en anneau","Topologie en bus","Topologie en maille"],ans:2},
-  {num:6,section:"Réseaux & Topologies",q:"Quel est l'avantage principal de la topologie en étoile par rapport à la topologie en bus ?",opts:["Elle utilise moins de câbles","Elle est moins coûteuse","Une panne d'un ordinateur n'affecte pas le reste du réseau","Elle ne nécessite aucun équipement central"],ans:2},
-  {num:7,section:"Réseaux & Topologies",q:"Dans une topologie en anneau, chaque ordinateur joue le rôle de :",opts:["Routeur","Répéteur","Concentrateur","Commutateur"],ans:1},
-  {num:8,section:"Réseaux & Topologies",q:"Combien de câbles sont nécessaires pour une topologie en maille complète avec N nœuds ?",opts:["N câbles","N-1 câbles","N(N-1)/2 câbles","N² câbles"],ans:2},
-  {num:9,section:"Réseaux & Topologies",q:"Dans quel cas est-il conseillé d'utiliser une topologie en bus ?",opts:["Pour des réseaux de grande taille avec beaucoup d'utilisateurs","Pour des réseaux de petite taille avec une configuration figée","Quand la reconfiguration fréquente est nécessaire","Quand un réseau à haute vitesse est requis"],ans:1},
-  {num:10,section:"Réseaux & Topologies",q:"Quelle topologie est appelée aussi « topologie hiérarchique » ?",opts:["Topologie en anneau","Topologie hybride","Topologie en maille","Topologie en arbre"],ans:3},
-  {num:11,section:"Architecture Réseau",q:"Dans une architecture poste à poste (peer-to-peer), comment sont organisés les ordinateurs ?",opts:["Un serveur central gère tous les clients","Tous les ordinateurs sont égaux, chacun est à la fois client et serveur","Un ordinateur maître contrôle tous les autres","Les machines sont organisées en hiérarchie stricte"],ans:1},
-  {num:12,section:"Architecture Réseau",q:"L'architecture poste à poste est généralement adaptée pour un environnement avec :",opts:["Plus de 100 utilisateurs répartis sur plusieurs sites","Moins de 10 utilisateurs dans une même zone géographique","Un haut niveau de sécurité requis","Un réseau amené à évoluer significativement"],ans:1},
-  {num:13,section:"Architecture Réseau",q:"Quel est le principal avantage du modèle client/serveur par rapport au modèle poste à poste ?",opts:["Il est moins coûteux à mettre en place","Il ne nécessite aucun administrateur réseau","Il offre une meilleure sécurité et une administration centralisée","Il fonctionne sans serveur dédié"],ans:2},
-  {num:14,section:"Architecture Réseau",q:"Dans le modèle client/serveur, que fait le client en premier dans une communication ?",opts:["Il envoie sa réponse au serveur","Il émet une requête vers le serveur via son adresse IP","Il traite la demande du serveur","Il configure la connexion réseau"],ans:1},
-  {num:15,section:"Architecture Réseau",q:"Quel est l'inconvénient principal du modèle client/serveur ?",opts:["Les clients sont peu nombreux","L'administration est décentralisée","Le serveur est un point unique de défaillance et son coût est élevé","Il ne permet pas le partage de ressources"],ans:2},
-  {num:16,section:"Adressage IP",q:"Combien de bits composent une adresse IPv4 ?",opts:["16 bits","32 bits","64 bits","128 bits"],ans:1},
-  {num:17,section:"Adressage IP",q:"Une adresse IPv4 est composée de deux parties. Lesquelles ?",opts:["Adresse MAC et adresse logique","Partie réseau et partie hôte","Adresse source et adresse destination","Adresse publique et adresse privée"],ans:1},
-  {num:18,section:"Adressage IP",q:"Quelle est la classe d'adresse IP dont la plage est 128.0.0.0 – 191.255.255.255 ?",opts:["Classe A","Classe B","Classe C","Classe D"],ans:1},
-  {num:19,section:"Adressage IP",q:"Quel est le masque par défaut de la classe C ?",opts:["255.0.0.0 (/8)","255.255.0.0 (/16)","255.255.255.0 (/24)","255.255.255.255 (/32)"],ans:2},
-  {num:20,section:"Adressage IP",q:"Quel rôle joue l'adresse 127.0.0.1 ?",opts:["Adresse de broadcast général","Adresse APIPA","Adresse de loopback (localhost)","Adresse non définie"],ans:2},
-  {num:21,section:"Adressage IP",q:"Quelle est la plage d'adresses privées de classe A ?",opts:["172.16.0.0 – 172.31.255.255","192.168.0.0 – 192.168.255.255","10.0.0.0 – 10.255.255.255","1.0.0.0 – 126.255.255.255"],ans:2},
-  {num:22,section:"Adressage IP",q:"Pourquoi les adresses IP privées ne sont-elles pas routables sur Internet ?",opts:["Parce qu'elles sont réservées aux réseaux militaires","Parce qu'elles sont utilisées uniquement en interne et non uniques globalement","Parce qu'elles sont de format IPv6","Parce qu'elles nécessitent un masque spécial"],ans:1},
-  {num:23,section:"Adressage IP",q:"Que représente l'adresse 255.255.255.255 ?",opts:["Adresse de loopback","Adresse non définie","Broadcast général","Adresse APIPA"],ans:2},
-  {num:24,section:"Adressage IP",q:"Quelle est la plage d'adresses IP de classe A ?",opts:["1.0.0.0 – 126.255.255.255","128.0.0.0 – 191.255.255.255","192.0.0.0 – 223.255.255.255","224.0.0.0 – 239.255.255.255"],ans:0},
-  {num:25,section:"Adressage IP",q:"Que désigne la plage d'adresses 169.254.x.x ?",opts:["Adresses publiques","Adresses APIPA (auto-configuration)","Adresses de multicast","Adresses de loopback"],ans:1},
-  {num:26,section:"Adressage IP",q:"Quel est le rôle d'une adresse IP ?",opts:["Identifier physiquement la carte réseau","Identifier un hôte, localiser un réseau et permettre le routage des paquets","Chiffrer les communications","Gérer la bande passante du réseau"],ans:1},
-  {num:27,section:"Adressage IP",q:"Quelle est la plage d'adresses privées de classe B ?",opts:["10.0.0.0 – 10.255.255.255","172.16.0.0 – 172.31.255.255","192.168.0.0 – 192.168.255.255","128.0.0.0 – 191.255.255.255"],ans:1},
-  {num:28,section:"Adressage IP",q:"Pour l'adresse IP 192.168.1.10 avec le masque 255.255.255.0, quelle est la partie réseau ?",opts:["192.168","192.168.1","192.168.1.10","10"],ans:1},
-  {num:29,section:"Routage & Commutation",q:"Quel équipement réseau permet d'interconnecter plusieurs réseaux IP différents ?",opts:["Hub (concentrateur)","Switch (commutateur)","Routeur","Répéteur"],ans:2},
-  {num:30,section:"Routage & Commutation",q:"Quelle est la principale fonction d'un switch (commutateur) ?",opts:["Connecter des réseaux de différentes technologies","Commuter des trames au niveau de la couche liaison en fonction des adresses MAC","Attribuer des adresses IP dynamiquement","Chiffrer les données transmises"],ans:1},
-  {num:31,section:"Routage & Commutation",q:"Quelle est la différence principale entre un Hub et un Switch ?",opts:["Le Hub est plus rapide que le Switch","Le Hub diffuse à tous les ports, le Switch envoie uniquement au port de destination","Le Switch fonctionne en mode sans-fil uniquement","Le Hub gère les adresses IP, le Switch gère les adresses MAC"],ans:1},
-  {num:32,section:"Routage & Commutation",q:"Le routage permet d'acheminer les paquets en se basant sur :",opts:["Les adresses MAC des équipements","Le nom des machines","Les adresses IP source et destination","Le numéro de port physique"],ans:2},
-  {num:33,section:"Modèle TCP/IP",q:"Combien de couches comporte le modèle TCP/IP ?",opts:["3 couches","4 couches","5 couches","7 couches"],ans:1},
-  {num:34,section:"Modèle TCP/IP",q:"Quelle couche du modèle TCP/IP est responsable de l'acheminement des paquets entre réseaux ?",opts:["Couche Application","Couche Transport","Couche Internet (Réseau)","Couche Accès Réseau"],ans:2},
-  {num:35,section:"Modèle TCP/IP",q:"Quel protocole de la couche Transport du modèle TCP/IP garantit la livraison fiable des données ?",opts:["IP","UDP","TCP","ICMP"],ans:2},
-  {num:36,section:"Modèle TCP/IP",q:"Quelle est la signification de l'acronyme TCP/IP ?",opts:["Transfer Control Protocol / Internet Protocol","Transmission Control Protocol / Internet Protocol","Terminal Communication Protocol / Internet Protocol","Transmission Control Protocol / Intranet Protocol"],ans:1},
-  {num:37,section:"Modèle TCP/IP",q:"Quel type de réseau couvre une zone géographique restreinte (bâtiment, campus) ?",opts:["WAN","MAN","LAN","VPN"],ans:2},
-  {num:38,section:"Modèle TCP/IP",q:"Le protocole UDP se distingue de TCP par :",opts:["Sa garantie de livraison des données","Son contrôle d'erreur intégré","Son absence de connexion préalable et de garantie de livraison","Sa capacité à router les paquets"],ans:2},
-  {num:39,section:"Modèle TCP/IP",q:"Quelle est la topologie la plus fréquemment utilisée dans les réseaux locaux modernes ?",opts:["Topologie en bus","Topologie en anneau","Topologie en étoile","Topologie en maille"],ans:2},
-  {num:40,section:"Modèle TCP/IP",q:"Lequel des éléments suivants est un exemple d'adresse IP de classe C privée ?",opts:["10.0.0.1","172.20.0.1","192.168.10.5","200.168.10.5"],ans:2},
+// ============================================================
+//  CONFIG — STOCKEE DANS LOCALSTORAGE (jamais dans le code)
+//  Pas de token ici ! Il est entre via la page de configuration.
+// ============================================================
+const REPO_OWNER = "karamo-k";
+const REPO_NAME  = "qcm-architecture-1tiers";
+const CSV_FILE   = "note_L2.csv";
+
+function getToken(){return localStorage.getItem('qcm_gh_token')||'';}
+function getBranch(){return localStorage.getItem('qcm_gh_branch')||'main';}
+function hasToken(){return !!getToken();}
+
+function saveConfig(){
+  const tok=document.getElementById('cfgToken').value.trim();
+  const br=document.getElementById('cfgBranch').value.trim()||'main';
+  const e=document.getElementById('cfgErr');
+  if(!tok||(!tok.startsWith('ghp_')&&!tok.startsWith('github_pat_'))){
+    e.style.display='block';
+    e.textContent='Le token doit commencer par ghp_ ou github_pat_';
+    return;
+  }
+  e.style.display='none';
+  localStorage.setItem('qcm_gh_token',tok);
+  localStorage.setItem('qcm_gh_branch',br);
+  showScr('loginScreen');
+  updateTokenStatus();
+  alert('Configuration sauvegardee ! Le token est stocke dans votre navigateur uniquement.');
+}
+function skipSetup(){showScr('loginScreen');}
+function updateTokenStatus(){
+  const box=document.getElementById('tokenStatusBox');
+  if(hasToken()){
+    box.innerHTML='&#10003; Token GitHub configure &bull; Synchronisation <strong>activee</strong> vers note_L2.csv<br/>&#128336; Duree : <strong>1h 30 min</strong> &bull; 40 questions';
+    box.style.borderColor='rgba(72,187,120,.3)';
+    box.style.background='rgba(72,187,120,.06)';
+    box.style.color='#68d391';
+  }else{
+    box.innerHTML='&#9888;&#65039; Synchronisation GitHub <strong>non configuree</strong>.<br/>&#128336; Duree : <strong>1h 30 min</strong> &bull; 40 questions &bull; Soumission automatique';
+    box.style.borderColor='';box.style.background='';box.style.color='';
+  }
+}
+
+// ============================================================
+const QS=[
+  {n:1,s:"Reseaux & Topologies",q:"Qu'est-ce qu'un reseau informatique ?",o:["Un ensemble de logiciels installes sur un seul ordinateur","Un ensemble d'ordinateurs, peripheriques et equipements interconnectes pour echanger des donnees","Un systeme de stockage de fichiers locaux","Un protocole de communication entre deux machines"],a:1},
+  {n:2,s:"Reseaux & Topologies",q:"Parmi les propositions suivantes, laquelle n'est PAS un objectif d'un reseau informatique ?",o:["Partage de ressources (imprimantes, fichiers)","Communication entre utilisateurs","Augmentation de la vitesse du processeur","Acces a Internet"],a:2},
+  {n:3,s:"Reseaux & Topologies",q:"Quel equipement est le noeud central dans une topologie en etoile ?",o:["Routeur","Modem","Hub ou Switch","Repeteur"],a:2},
+  {n:4,s:"Reseaux & Topologies",q:"Dans une topologie en bus, quel composant est place aux extremites du cable pour eviter les rebonds de signal ?",o:["Un repeteur","Un bouchon de terminaison","Un concentrateur","Un connecteur RJ45"],a:1},
+  {n:5,s:"Reseaux & Topologies",q:"Quelle topologie utilise un cable coaxial avec des connecteurs en T ?",o:["Topologie en etoile","Topologie en anneau","Topologie en bus","Topologie en maille"],a:2},
+  {n:6,s:"Reseaux & Topologies",q:"Quel est l'avantage principal de la topologie en etoile par rapport a la topologie en bus ?",o:["Elle utilise moins de cables","Elle est moins couteuse","Une panne d'un ordinateur n'affecte pas le reste du reseau","Elle ne necessite aucun equipement central"],a:2},
+  {n:7,s:"Reseaux & Topologies",q:"Dans une topologie en anneau, chaque ordinateur joue le role de :",o:["Routeur","Repeteur","Concentrateur","Commutateur"],a:1},
+  {n:8,s:"Reseaux & Topologies",q:"Combien de cables sont necessaires pour une topologie en maille complete avec N noeuds ?",o:["N cables","N-1 cables","N(N-1)/2 cables","N2 cables"],a:2},
+  {n:9,s:"Reseaux & Topologies",q:"Dans quel cas est-il conseille d'utiliser une topologie en bus ?",o:["Pour des reseaux de grande taille avec beaucoup d'utilisateurs","Pour des reseaux de petite taille avec une configuration figee","Quand la reconfiguration frequente est necessaire","Quand un reseau a haute vitesse est requis"],a:1},
+  {n:10,s:"Reseaux & Topologies",q:"Quelle topologie est appelee aussi topologie hierarchique ?",o:["Topologie en anneau","Topologie hybride","Topologie en maille","Topologie en arbre"],a:3},
+  {n:11,s:"Architecture Reseau",q:"Dans une architecture poste a poste (peer-to-peer), comment sont organises les ordinateurs ?",o:["Un serveur central gere tous les clients","Tous les ordinateurs sont egaux, chacun est a la fois client et serveur","Un ordinateur maitre controle tous les autres","Les machines sont organisees en hierarchie stricte"],a:1},
+  {n:12,s:"Architecture Reseau",q:"L'architecture poste a poste est generalement adaptee pour un environnement avec :",o:["Plus de 100 utilisateurs repartis sur plusieurs sites","Moins de 10 utilisateurs dans une meme zone geographique","Un haut niveau de securite requis","Un reseau amene a evoluer significativement"],a:1},
+  {n:13,s:"Architecture Reseau",q:"Quel est le principal avantage du modele client/serveur par rapport au modele poste a poste ?",o:["Il est moins couteux a mettre en place","Il ne necessite aucun administrateur reseau","Il offre une meilleure securite et une administration centralisee","Il fonctionne sans serveur dedie"],a:2},
+  {n:14,s:"Architecture Reseau",q:"Dans le modele client/serveur, que fait le client en premier dans une communication ?",o:["Il envoie sa reponse au serveur","Il emet une requete vers le serveur via son adresse IP","Il traite la demande du serveur","Il configure la connexion reseau"],a:1},
+  {n:15,s:"Architecture Reseau",q:"Quel est l'inconvenient principal du modele client/serveur ?",o:["Les clients sont peu nombreux","L'administration est decentralisee","Le serveur est un point unique de defaillance et son cout est eleve","Il ne permet pas le partage de ressources"],a:2},
+  {n:16,s:"Adressage IP",q:"Combien de bits composent une adresse IPv4 ?",o:["16 bits","32 bits","64 bits","128 bits"],a:1},
+  {n:17,s:"Adressage IP",q:"Une adresse IPv4 est composee de deux parties. Lesquelles ?",o:["Adresse MAC et adresse logique","Partie reseau et partie hote","Adresse source et adresse destination","Adresse publique et adresse privee"],a:1},
+  {n:18,s:"Adressage IP",q:"Quelle est la classe d'adresse IP dont la plage est 128.0.0.0 - 191.255.255.255 ?",o:["Classe A","Classe B","Classe C","Classe D"],a:1},
+  {n:19,s:"Adressage IP",q:"Quel est le masque par defaut de la classe C ?",o:["255.0.0.0 (/8)","255.255.0.0 (/16)","255.255.255.0 (/24)","255.255.255.255 (/32)"],a:2},
+  {n:20,s:"Adressage IP",q:"Quel role joue l'adresse 127.0.0.1 ?",o:["Adresse de broadcast general","Adresse APIPA","Adresse de loopback (localhost)","Adresse non definie"],a:2},
+  {n:21,s:"Adressage IP",q:"Quelle est la plage d'adresses privees de classe A ?",o:["172.16.0.0 - 172.31.255.255","192.168.0.0 - 192.168.255.255","10.0.0.0 - 10.255.255.255","1.0.0.0 - 126.255.255.255"],a:2},
+  {n:22,s:"Adressage IP",q:"Pourquoi les adresses IP privees ne sont-elles pas routables sur Internet ?",o:["Parce qu'elles sont reservees aux reseaux militaires","Parce qu'elles sont utilisees uniquement en interne et non uniques globalement","Parce qu'elles sont de format IPv6","Parce qu'elles necessitent un masque special"],a:1},
+  {n:23,s:"Adressage IP",q:"Que represente l'adresse 255.255.255.255 ?",o:["Adresse de loopback","Adresse non definie","Broadcast general","Adresse APIPA"],a:2},
+  {n:24,s:"Adressage IP",q:"Quelle est la plage d'adresses IP de classe A ?",o:["1.0.0.0 - 126.255.255.255","128.0.0.0 - 191.255.255.255","192.0.0.0 - 223.255.255.255","224.0.0.0 - 239.255.255.255"],a:0},
+  {n:25,s:"Adressage IP",q:"Que designe la plage d'adresses 169.254.x.x ?",o:["Adresses publiques","Adresses APIPA (auto-configuration)","Adresses de multicast","Adresses de loopback"],a:1},
+  {n:26,s:"Adressage IP",q:"Quel est le role d'une adresse IP ?",o:["Identifier physiquement la carte reseau","Identifier un hote, localiser un reseau et permettre le routage des paquets","Chiffrer les communications","Gerer la bande passante du reseau"],a:1},
+  {n:27,s:"Adressage IP",q:"Quelle est la plage d'adresses privees de classe B ?",o:["10.0.0.0 - 10.255.255.255","172.16.0.0 - 172.31.255.255","192.168.0.0 - 192.168.255.255","128.0.0.0 - 191.255.255.255"],a:1},
+  {n:28,s:"Adressage IP",q:"Pour l'adresse IP 192.168.1.10 avec le masque 255.255.255.0, quelle est la partie reseau ?",o:["192.168","192.168.1","192.168.1.10","10"],a:1},
+  {n:29,s:"Routage & Commutation",q:"Quel equipement reseau permet d'interconnecter plusieurs reseaux IP differents ?",o:["Hub (concentrateur)","Switch (commutateur)","Routeur","Repeteur"],a:2},
+  {n:30,s:"Routage & Commutation",q:"Quelle est la principale fonction d'un switch (commutateur) ?",o:["Connecter des reseaux de differentes technologies","Commuter des trames au niveau de la couche liaison en fonction des adresses MAC","Attribuer des adresses IP dynamiquement","Chiffrer les donnees transmises"],a:1},
+  {n:31,s:"Routage & Commutation",q:"Quelle est la difference principale entre un Hub et un Switch ?",o:["Le Hub est plus rapide que le Switch","Le Hub diffuse a tous les ports, le Switch envoie uniquement au port de destination","Le Switch fonctionne en mode sans-fil uniquement","Le Hub gere les adresses IP, le Switch gere les adresses MAC"],a:1},
+  {n:32,s:"Routage & Commutation",q:"Le routage permet d'acheminer les paquets en se basant sur :",o:["Les adresses MAC des equipements","Le nom des machines","Les adresses IP source et destination","Le numero de port physique"],a:2},
+  {n:33,s:"Modele TCP/IP",q:"Combien de couches comporte le modele TCP/IP ?",o:["3 couches","4 couches","5 couches","7 couches"],a:1},
+  {n:34,s:"Modele TCP/IP",q:"Quelle couche du modele TCP/IP est responsable de l'acheminement des paquets entre reseaux ?",o:["Couche Application","Couche Transport","Couche Internet (Reseau)","Couche Acces Reseau"],a:2},
+  {n:35,s:"Modele TCP/IP",q:"Quel protocole de la couche Transport du modele TCP/IP garantit la livraison fiable des donnees ?",o:["IP","UDP","TCP","ICMP"],a:2},
+  {n:36,s:"Modele TCP/IP",q:"Quelle est la signification de l'acronyme TCP/IP ?",o:["Transfer Control Protocol / Internet Protocol","Transmission Control Protocol / Internet Protocol","Terminal Communication Protocol / Internet Protocol","Transmission Control Protocol / Intranet Protocol"],a:1},
+  {n:37,s:"Modele TCP/IP",q:"Quel type de reseau couvre une zone geographique restreinte (batiment, campus) ?",o:["WAN","MAN","LAN","VPN"],a:2},
+  {n:38,s:"Modele TCP/IP",q:"Le protocole UDP se distingue de TCP par :",o:["Sa garantie de livraison des donnees","Son controle d'erreur integre","Son absence de connexion prealable et de garantie de livraison","Sa capacite a router les paquets"],a:2},
+  {n:39,s:"Modele TCP/IP",q:"Quelle est la topologie la plus frequemment utilisee dans les reseaux locaux modernes ?",o:["Topologie en bus","Topologie en anneau","Topologie en etoile","Topologie en maille"],a:2},
+  {n:40,s:"Modele TCP/IP",q:"Lequel des elements suivants est un exemple d'adresse IP de classe C privee ?",o:["10.0.0.1","172.20.0.1","192.168.10.5","200.168.10.5"],a:2}
 ];
+const LBL=["A","B","C","D"];
+const TOTAL=90*60;
+const SECOL={"Reseaux & Topologies":{bg:"#0f4c75",pill:"#63b3ed"},"Architecture Reseau":{bg:"#1a3a1a",pill:"#68d391"},"Adressage IP":{bg:"#4a1942",pill:"#d6bcfa"},"Routage & Commutation":{bg:"#7c3100",pill:"#fbd38d"},"Modele TCP/IP":{bg:"#1a365d",pill:"#90cdf4"}};
+const SECS=["Reseaux & Topologies","Architecture Reseau","Adressage IP","Routage & Commutation","Modele TCP/IP"];
 
-const LABELS = ["A","B","C","D"];
-const TOTAL = 90*60;
-const SEC_COLORS = {
-  "Réseaux & Topologies":{bg:"#0f4c75",pill:"#63b3ed"},
-  "Architecture Réseau":{bg:"#1a3a1a",pill:"#68d391"},
-  "Adressage IP":{bg:"#4a1942",pill:"#d6bcfa"},
-  "Routage & Commutation":{bg:"#7c3100",pill:"#fbd38d"},
-  "Modèle TCP/IP":{bg:"#1a365d",pill:"#90cdf4"},
+let user={nom:"",prenom:"",spec:""};
+let ans=new Array(40).fill(null);
+let cur=0,tLeft=TOTAL,tInt=null,done=false,tout=false;
+const $=id=>document.getElementById(id);
+function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active','slide-up');setTimeout(()=>$(id).classList.remove('slide-up'),500);}
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return(h?h+":":"")+String(m).padStart(2,'0')+":"+String(ss).padStart(2,'0');}
+function mention(sc){const p=sc/40;if(p>=.9)return{l:"Excellent !",c:"#ffd700"};if(p>=.75)return{l:"Tres Bien",c:"#68d391"};if(p>=.6)return{l:"Bien",c:"#90cdf4"};if(p>=.5)return{l:"Passable",c:"#fbd38d"};return{l:"Insuffisant",c:"#fc8181"};}
+function acnt(){return ans.filter(a=>a!==null).length;}
+function score(){return ans.filter((a,i)=>a===QS[i].a).length;}
+
+// Initialisation
+window.onload=function(){
+  updateTokenStatus();
+  showScr('loginScreen');
 };
-const SECTIONS = ["Réseaux & Topologies","Architecture Réseau","Adressage IP","Routage & Commutation","Modèle TCP/IP"];
 
-// ══════════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════════
-let user = {nom:"",prenom:"",spec:""};
-let answers = new Array(40).fill(null);
-let current = 0;
-let timeLeft = TOTAL;
-let timerInterval = null;
-let submitted = false;
-let timedOut = false;
-let synced = false;
-
-// ══════════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════════
-function $(id){return document.getElementById(id);}
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');});
-  $(id).classList.add('active');
-  $(id).classList.add('slide-up');
-  setTimeout(()=>$(id).classList.remove('slide-up'),500);
-}
-function formatTime(s){
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
-  return (h>0?h+":":"")+String(m).padStart(2,'0')+":"+String(ss).padStart(2,'0');
-}
-function getMention(score){
-  const p=score/40;
-  if(p>=.9) return{label:"Excellent !",color:"#ffd700"};
-  if(p>=.75) return{label:"Très Bien",color:"#68d391"};
-  if(p>=.6) return{label:"Bien",color:"#90cdf4"};
-  if(p>=.5) return{label:"Passable",color:"#fbd38d"};
-  return{label:"Insuffisant",color:"#fc8181"};
-}
-function answeredCount(){return answers.filter(a=>a!==null).length;}
-
-// ══════════════════════════════════════════════
-//  LOGIN
-// ══════════════════════════════════════════════
 function startExam(){
-  const nom=$('inputNom').value.trim();
-  const prenom=$('inputPrenom').value.trim();
-  const spec=$('inputSpec').value.trim();
-  const err=$('loginError');
-  if(!nom||!prenom){err.style.display='block';err.textContent='⚠️ Veuillez entrer votre nom et prénom.';return;}
-  if(!spec){err.style.display='block';err.textContent='⚠️ Veuillez entrer votre spécialité.';return;}
-  err.style.display='none';
-  user={nom,prenom,spec};
-  answers=new Array(40).fill(null);
-  current=0;timeLeft=TOTAL;submitted=false;timedOut=false;synced=false;
-  initQCM();
+  const nom=$('iNom').value.trim(),prenom=$('iPrenom').value.trim(),spec=$('iSpec').value.trim();
+  const e=$('loginErr');
+  if(!nom||!prenom){e.style.display='block';e.textContent='Veuillez entrer votre nom et prenom.';return;}
+  if(!spec){e.style.display='block';e.textContent='Veuillez entrer votre specialite.';return;}
+  e.style.display='none';
+  user={nom,prenom,spec};ans=new Array(40).fill(null);cur=0;tLeft=TOTAL;done=false;tout=false;
+  $('avt').textContent=prenom[0]+nom[0];$('uName').textContent=prenom+' '+nom;$('uSpec').textContent=spec;
+  showScr('qcmScreen');renderQ();
+  clearInterval(tInt);tInt=setInterval(()=>{tLeft--;updT();if(tLeft<=0){clearInterval(tInt);tout=true;submitExam(true);}},1000);updT();
 }
-
-// ══════════════════════════════════════════════
-//  QCM INIT
-// ══════════════════════════════════════════════
-function initQCM(){
-  $('avatarEl').textContent=user.prenom[0]+user.nom[0];
-  $('uName').textContent=user.prenom+' '+user.nom;
-  $('uSpec').textContent=user.spec;
-  showScreen('qcmScreen');
-  renderQuestion();
-  startTimer();
+function updT(){$('timerTxt').textContent=fmt(tLeft);const u=tLeft<=300;$('timerEl').classList.toggle('urgent',u);$('tdot').classList.toggle('urgent',u);}
+function renderQ(){
+  const q=QS[cur],sc2=SECOL[q.s]||{bg:"#1a1a2e",pill:"#aaa"};
+  $('progFill').style.width=(acnt()/40*100)+'%';
+  $('progTxt').textContent=acnt()+'/40 repondues';
+  $('qPosTxt').textContent='Q'+(cur+1)+' sur 40';
+  $('btnPrev').disabled=cur===0;
+  $('btnNext').style.display=cur<39?'':'none';
+  $('btnSub').style.display=cur===39?'':'none';
+  $('qcmBody').innerHTML=`<div class="sp" style="background:${sc2.bg};color:${sc2.pill}">* ${q.s}</div><div class="qn">QUESTION ${q.n} / 40</div><div class="qt">${q.q}</div><div class="opts" id="opts"></div>`;
+  q.o.forEach((o,i)=>{const b=document.createElement('button');b.className='opt'+(ans[cur]===i?' sel':'');b.innerHTML=`<div class="ol">${LBL[i]}</div><div class="ot">${o}</div>`;b.onclick=()=>{if(!done){ans[cur]=i;renderQ();}};$('opts').appendChild(b);});
 }
-
-function startTimer(){
-  clearInterval(timerInterval);
-  timerInterval=setInterval(()=>{
-    timeLeft--;
-    updateTimerDisplay();
-    if(timeLeft<=0){
-      clearInterval(timerInterval);
-      timedOut=true;
-      submitExam(true);
-    }
-  },1000);
-  updateTimerDisplay();
-}
-
-function updateTimerDisplay(){
-  const el=$('timerEl'), dot=$('tdot'), txt=$('timerText');
-  txt.textContent=formatTime(timeLeft);
-  if(timeLeft<=300){el.classList.add('urgent');dot.classList.add('urgent');}
-  else{el.classList.remove('urgent');dot.classList.remove('urgent');}
-}
-
-// ══════════════════════════════════════════════
-//  RENDER QUESTION
-// ══════════════════════════════════════════════
-function renderQuestion(){
-  const q=QUESTIONS[current];
-  const sc=SEC_COLORS[q.section]||{bg:"#1a1a2e",pill:"#aaa"};
-
-  // Header
-  $('progFill').style.width=(answeredCount()/40*100)+'%';
-  $('progText').textContent=answeredCount()+'/40 répondues';
-  $('qPosText').textContent='Q'+(current+1)+' sur 40';
-
-  // Nav buttons
-  $('btnPrev').disabled=current===0;
-  $('btnNext').style.display=current<39?'':'none';
-  $('btnSubmit').style.display=current===39?'':'none';
-
-  // Body
-  const body=$('qcmBody');
-  body.innerHTML=`
-    <div class="sec-pill" style="background:${sc.bg};color:${sc.pill}">● ${q.section}</div>
-    <div class="q-num">QUESTION ${q.num} / 40</div>
-    <div class="q-text">${q.q}</div>
-    <div class="options" id="optsList"></div>
-  `;
-  const opts=document.getElementById('optsList');
-  q.opts.forEach((opt,i)=>{
-    const btn=document.createElement('button');
-    btn.className='opt'+(answers[current]===i?' selected':'');
-    btn.innerHTML=`<div class="opt-label">${LABELS[i]}</div><div class="opt-text">${opt}</div>`;
-    btn.onclick=()=>selectAnswer(i);
-    opts.appendChild(btn);
-  });
-}
-
-function selectAnswer(idx){
-  if(submitted)return;
-  answers[current]=idx;
-  renderQuestion();
-}
-
-function navigate(dir){
-  current=Math.max(0,Math.min(39,current+dir));
-  renderQuestion();
-}
-
-// ══════════════════════════════════════════════
-//  MAP
-// ══════════════════════════════════════════════
+function nav(d){cur=Math.max(0,Math.min(39,cur+d));renderQ();}
 $('btnMap').onclick=()=>{
-  const grid=$('mapGrid');
-  grid.innerHTML='';
-  $('mapTitle').textContent='📋 Navigation — '+answeredCount()+'/40 répondues';
-  QUESTIONS.forEach((_,i)=>{
-    const cell=document.createElement('div');
-    cell.className='map-cell'+(i===current?' current':answers[i]!==null?' answered':'');
-    cell.textContent=i+1;
-    cell.onclick=()=>{current=i;renderQuestion();closeMap(null,true);};
-    grid.appendChild(cell);
-  });
+  $('mapTitle').textContent='Navigation - '+acnt()+'/40 repondues';
+  $('mapGrid').innerHTML='';
+  QS.forEach((_,i)=>{const c=document.createElement('div');c.className='mc'+(i===cur?' cur':ans[i]!==null?' ans':'');c.textContent=i+1;c.onclick=()=>{cur=i;renderQ();$('mapModal').classList.remove('open');};$('mapGrid').appendChild(c);});
   $('mapModal').classList.add('open');
 };
-function closeMap(e,force=false){if(force||e.target===$('mapModal'))$('mapModal').classList.remove('open');}
-
-// ══════════════════════════════════════════════
-//  CONFIRM + SUBMIT
-// ══════════════════════════════════════════════
 function openConfirm(){
-  const cnt=answeredCount();
-  const missing=40-cnt;
-  $('confirmSub').innerHTML=`Vous avez répondu à <strong>${cnt} / 40</strong> questions.<br>`+
-    (missing>0?`<span style="color:#fc8181">${missing} question(s) sans réponse.</span><br>`:'')+
-    `Temps restant : <strong>${formatTime(timeLeft)}</strong>`;
-  $('confirmModal').classList.add('open');
+  const cnt=acnt(),miss=40-cnt;
+  $('confSub').innerHTML=`Vous avez repondu a <strong>${cnt} / 40</strong> questions.<br>`+(miss>0?`<span style="color:#fc8181">${miss} sans reponse.</span><br>`:'')+`Temps restant : <strong>${fmt(tLeft)}</strong>`;
+  $('confModal').classList.add('open');
 }
-function closeConfirm(){$('confirmModal').classList.remove('open');}
-
-function submitExam(auto=false){
-  clearInterval(timerInterval);
-  submitted=true;
-  $('confirmModal').classList.remove('open');
-  showResults(auto);
-}
-
-// ══════════════════════════════════════════════
-//  RESULTS
-// ══════════════════════════════════════════════
+function submitExam(auto=false){clearInterval(tInt);done=true;$('confModal').classList.remove('open');showResults(auto);}
 function showResults(auto){
-  showScreen('resultsScreen');
-  if(auto||timedOut) $('timeoutBadge').style.display='block';
-  else $('timeoutBadge').style.display='none';
-
-  const score=answers.filter((a,i)=>a===QUESTIONS[i].ans).length;
-  const mention=getMention(score);
-  const pct=score/40;
-  const circ=2*Math.PI*54;
-
-  $('scoreNum').textContent=score;
-  $('scoreNum').style.color=mention.color;
-  $('scoreGrade').textContent=mention.label;
-  $('scoreGrade').style.color=mention.color;
-  $('scoreUser').textContent=user.prenom+' '+user.nom+' — '+user.spec;
-
-  // Animate ring
-  const ring=$('ringFill');
-  ring.style.stroke=mention.color;
-  ring.style.strokeDashoffset=circ;
-  setTimeout(()=>{ring.style.strokeDashoffset=circ*(1-pct);},100);
-
-  // Stats
-  $('statsRow').innerHTML=`
-    <div class="stat-card"><div class="stat-val" style="color:#68d391">${score}</div><div class="stat-lbl">Correctes</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:#fc8181">${40-score}</div><div class="stat-lbl">Incorrectes</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:#90cdf4">${Math.round(pct*100)}%</div><div class="stat-lbl">Score</div></div>
-  `;
-
-  // Section results
-  const secDiv=$('sectionResults');
-  secDiv.innerHTML='';
-  SECTIONS.forEach(sec=>{
-    const secQs=QUESTIONS.filter(q=>q.section===sec);
-    const secScore=secQs.filter(q=>answers[q.num-1]===q.ans).length;
-    const col=SEC_COLORS[sec]||{pill:"#aaa"};
-    let html=`<div class="sec-results"><h3 style="color:${col.pill}">${sec} — ${secScore}/${secQs.length}</h3>`;
-    secQs.forEach(q=>{
-      const ua=answers[q.num-1];
-      const ok=ua===q.ans;
-      html+=`<div class="result-item">
-        <div class="r-icon">${ok?'✅':'❌'}</div>
-        <div style="flex:1">
-          <div class="r-q"><strong>Q${q.num}.</strong> ${q.q}</div>
-          <div class="r-a ${ok?'ok':'ko'}">Votre réponse : ${ua!==null?LABELS[ua]+'. '+q.opts[ua]:'Sans réponse'}</div>
-          ${!ok?`<div class="r-correct">✓ Bonne réponse : ${LABELS[q.ans]}. ${q.opts[q.ans]}</div>`:''}
-        </div>
-      </div>`;
-    });
-    html+='</div>';
-    secDiv.innerHTML+=html;
+  showScr('resultsScreen');
+  $('toBadge').style.display=(auto||tout)?'block':'none';
+  const sc=score(),m=mention(sc),pct=sc/40,circ=2*Math.PI*54;
+  $('sNum').textContent=sc;$('sNum').style.color=m.c;
+  $('sGrade').textContent=m.l;$('sGrade').style.color=m.c;
+  $('sUser').textContent=user.prenom+' '+user.nom+' - '+user.spec;
+  const ring=$('ringFill');ring.style.stroke=m.c;ring.style.strokeDashoffset=circ;
+  setTimeout(()=>{ring.style.strokeDashoffset=circ*(1-pct);},150);
+  $('statsRow').innerHTML=`<div class="sc2"><div class="sv2" style="color:#68d391">${sc}</div><div class="sl">Correctes</div></div><div class="sc2"><div class="sv2" style="color:#fc8181">${40-sc}</div><div class="sl">Incorrectes</div></div><div class="sc2"><div class="sv2" style="color:#90cdf4">${Math.round(pct*100)}%</div><div class="sl">Score</div></div>`;
+  // sync button state
+  const sb=$('syncBtn');sb.disabled=false;sb.style.background='';
+  sb.innerHTML=`<svg width="17" height="17" fill="white" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg> Enregistrer dans note_L2.csv (GitHub)`;
+  $('syncSt').className='ss';$('syncSt').textContent='';
+  const sd=$('secResults');sd.innerHTML='';
+  SECS.forEach(sec=>{
+    const sq=QS.filter(q=>q.s===sec),ss2=sq.filter(q=>ans[q.n-1]===q.a).length,col=SECOL[sec]||{pill:"#aaa"};
+    let h=`<div class="srs"><h3 style="color:${col.pill}">${sec} - ${ss2}/${sq.length}</h3>`;
+    sq.forEach(q=>{const ua=ans[q.n-1],ok=ua===q.a;h+=`<div class="ri"><div class="ric">${ok?'OK':'X'}</div><div style="flex:1"><div class="rq"><strong>Q${q.n}.</strong> ${q.q}</div><div class="ra ${ok?'ok':'ko'}">Votre reponse : ${ua!==null?LBL[ua]+'. '+q.o[ua]:'Sans reponse'}</div>${!ok?`<div class="rc">Bonne reponse : ${LBL[q.a]}. ${q.o[q.a]}</div>`:''}</div></div>`;});
+    h+='</div>';sd.innerHTML+=h;
   });
 }
 
-// ══════════════════════════════════════════════
-//  SYNC
-// ══════════════════════════════════════════════
-function syncResults(){
-  if(synced)return;
-  const score=answers.filter((a,i)=>a===QUESTIONS[i].ans).length;
-  const mention=getMention(score);
-  const data={
-    nom:user.nom, prenom:user.prenom, specialite:user.spec,
-    score, total:40, mention:mention.label,
-    pourcentage:Math.round(score/40*100),
-    timeUsed:TOTAL-timeLeft,
-    submittedAt:new Date().toLocaleString('fr-FR'),
-    answers:answers.map((a,i)=>({q:i+1,userAns:a,correct:QUESTIONS[i].ans,ok:a===QUESTIONS[i].ans}))
-  };
-
-  // Save locally
+// ============================================================
+//  GITHUB SYNC — token lu depuis localStorage (securise)
+// ============================================================
+const CSV_HDR='Nom;Prenom;Specialite;Note;Pourcentage;Mention;Date;Heure;Temps Utilise;Soumission';
+function buildRow(){
+  const sc=score(),m=mention(sc).l;
+  const now=new Date();
+  return `${user.nom};${user.prenom};${user.spec};${sc}/40;${Math.round(sc/40*100)}%;${m};${now.toLocaleDateString('fr-FR')};${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})};${fmt(TOTAL-tLeft)};${tout?'Automatique':'Manuelle'}`;
+}
+async function syncGitHub(){
+  const btn=$('syncBtn'),st=$('syncSt');
+  const TOKEN=getToken();
+  if(!TOKEN){
+    st.className='ss er';
+    st.textContent='Token GitHub non configure ! Cliquez sur "Configurer la synchronisation GitHub" en bas de la page de connexion.';
+    return;
+  }
+  btn.disabled=true;
+  btn.innerHTML='<div class="spin"></div> Connexion a GitHub...';
+  st.className='ss ld';st.textContent='Lecture du fichier note_L2.csv...';
+  const url=`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${CSV_FILE}`;
+  const hdr={'Authorization':'token '+TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+  let sha=null,existing=CSV_HDR;
   try{
-    const key='qcm_result_'+user.nom+'_'+user.prenom+'_'+Date.now();
-    localStorage.setItem(key,JSON.stringify(data));
-  }catch(e){}
-
-  synced=true;
-  const btn=$('syncBtn');
-  btn.textContent='✅ Données synchronisées — '+new Date().toLocaleTimeString('fr-FR');
-  btn.classList.add('synced');
+    const g=await fetch(url,{headers:hdr});
+    if(g.ok){const d=await g.json();sha=d.sha;existing=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));}
+    else if(g.status===401){throw new Error('Token invalide ou expire. Allez reconfigurer via la page de configuration.');}
+    else if(g.status!==404){const e=await g.json();throw new Error(e.message||'Erreur '+g.status);}
+  }catch(e){if(e.message.includes('401'))throw e;existing=CSV_HDR;}
+  const updated=existing+'\n'+buildRow();
+  const encoded=btoa(unescape(encodeURIComponent(updated)));
+  st.textContent='Enregistrement de la note...';
+  const body={message:`QCM ${user.prenom} ${user.nom} ${score()}/40 ${new Date().toLocaleDateString('fr-FR')}`,content:encoded,branch:getBranch()};
+  if(sha)body.sha=sha;
+  try{
+    const p=await fetch(url,{method:'PUT',headers:hdr,body:JSON.stringify(body)});
+    if(!p.ok){const e=await p.json();throw new Error(e.message||'Erreur PUT '+p.status);}
+    btn.innerHTML='OK Note enregistree sur GitHub !';
+    btn.style.background='linear-gradient(135deg,#48bb78,#38a169)';
+    st.className='ss ok';
+    st.textContent=`OK : ${user.prenom} ${user.nom} -> ${score()}/40 (${Math.round(score()/40*100)}%) ${mention(score()).l} — ajoute dans note_L2.csv !`;
+  }catch(e){
+    btn.disabled=false;
+    btn.innerHTML='<svg width="17" height="17" fill="white" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg> Reessayer';
+    st.className='ss er';st.textContent='Erreur : '+e.message;
+  }
 }
-
-// ══════════════════════════════════════════════
-//  RESET
-// ══════════════════════════════════════════════
-function resetApp(){
-  clearInterval(timerInterval);
-  answers=new Array(40).fill(null);
-  current=0;timeLeft=TOTAL;submitted=false;timedOut=false;synced=false;
-  $('syncBtn').textContent='📡 Synchroniser mes résultats';
-  $('syncBtn').classList.remove('synced');
-  $('inputNom').value='';$('inputPrenom').value='';$('inputSpec').value='';
-  showScreen('loginScreen');
+function dlCSV(){
+  const csv='\uFEFF'+CSV_HDR+'\n'+buildRow();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='note_'+user.nom+'_'+user.prenom+'.csv';a.click();
 }
-
-// ── Enter key on login
-['inputNom','inputPrenom','inputSpec'].forEach(id=>{
-  $(id).addEventListener('keydown',e=>{if(e.key==='Enter')startExam();});
-});
+function resetApp(){clearInterval(tInt);ans=new Array(40).fill(null);cur=0;tLeft=TOTAL;done=false;tout=false;['iNom','iPrenom','iSpec'].forEach(id=>$(id).value='');showScr('loginScreen');}
+['iNom','iPrenom','iSpec'].forEach(id=>{$(id).addEventListener('keydown',e=>{if(e.key==='Enter')startExam();});});
 </script>
 </body>
 </html>
